@@ -1,21 +1,33 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        config {
+            keyAlias 'dm'
+            keyPassword 'damcode'
+            storeFile file('C:/Users/dm/androidkey.jks')
+            storePassword 'damcode'
+        }
+    }
     compileSdkVersion 20
     buildToolsVersion "20.0.0"
-
     defaultConfig {
         applicationId "org.damcode.workout"
         minSdkVersion 16
-        targetSdkVersion 20
+        targetSdkVersion 16
         versionCode 1
         versionName "1.0"
+        signingConfig signingConfigs.config
     }
     buildTypes {
         release {
             runProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            zipAlign true
+            signingConfig signingConfigs.config
         }
+    }
+    productFlavors {
     }
 }
 
