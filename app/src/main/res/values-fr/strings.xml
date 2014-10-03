@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">WorkOut</string>
+    <string name="action_settings">Réglage</string>
+    <string name="action_add">Ajouter séance d\'entraînement</string>
+    <string name="new.workout">Nouvelle séance d\'entraînement</string>
+    <string name="title_activity_workout_item">Séance d\'entraînement</string>
+    <string name="action_add_step">Ajouter du temps de l\'étape (m)</string>
+    <string name="session.time">Chronométrer</string>
+    <string name="remove_workout">Supprimer l\'entraînement?</string>
+    <string name="session.stopped">Arrêté</string>
+    <string name="session.running">En cours d\'exécution</string>
+    <string name="session.continuous">Continuellement</string>
+    <string name="session.runonce">Exécuté une fois</string>
+    <string name="session.addstage">Ajouter stade d\'entraînement</string>
+    <string name="dialog.ok">Ok</string>
+    <string name="dialog.cancel">Annuler</string>
+    <string name="workout.enternewname">Entrer un nouveau nom</string>
+</resources>
