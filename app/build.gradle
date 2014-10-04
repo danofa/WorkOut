@@ -1,0 +1,32 @@
+apply plugin: 'com.android.application'
+
+android {
+    signingConfigs {
+        config {
+         }
+    }
+    compileSdkVersion 20
+    buildToolsVersion "20.0.0"
+    defaultConfig {
+        applicationId "org.damcode.workout"
+        minSdkVersion 16
+        targetSdkVersion 16
+        versionCode 1
+        versionName "1.0"
+        signingConfig signingConfigs.config
+    }
+    buildTypes {
+        release {
+            runProguard false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            zipAlign true
+            signingConfig signingConfigs.config
+        }
+    }
+    productFlavors {
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+}

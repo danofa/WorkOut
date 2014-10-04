@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:id="@+id/stepTime"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+<!--
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/session_item_down"
+        android:src="@drawable/ic_down"
+        android:background="@drawable/button_custom"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/session_item_up"
+        android:src="@drawable/ic_up"
+        android:background="@drawable/button_custom"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/session_item_down"
+        android:layout_toStartOf="@+id/session_item_down" />
+-->
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/session_item_del"
+        android:background="@drawable/button_custom"
+        android:src="@drawable/ic_menu_delete"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        />
+    <!--
+        android:layout_toLeftOf="@+id/session_item_up"
+        android:layout_toStartOf="@+id/session_item_up"
+-->
+
+</RelativeLayout>
