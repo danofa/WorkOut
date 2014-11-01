@@ -52,7 +52,7 @@ public class WorkoutDBAO implements Closeable {
             while (!curs.isAfterLast()) {
                 HashMap h = new HashMap();
                 h.put("name", curs.getString(nameCol));
-                h.put("id", curs.getLong(rowIdCol));
+                h.put("id", curs.getInt(rowIdCol));
                 results.add(h);
                 curs.moveToNext();
             }
@@ -67,23 +67,26 @@ public class WorkoutDBAO implements Closeable {
 
     }
 
-    public ArrayDeque getBeepQueue(long workoutId){
-        initDb();
-        ArrayDeque results = null;
 
-        Cursor curs = reader.rawQuery(GET_SESSIONS_FROM_WORKOUT + Long.toString(workoutId), null);
+    public ArrayDeque<int[]> getBeepQueue(int workoutId){
+        initDb();
+        ArrayDeque<int[]> results = null;
+
+
+
+        Cursor curs = reader.rawQuery(GET_SESSIONS_FROM_WORKOUT + Integer.toString(workoutId), null);
 
         if (curs.getCount() > 0) {
             results = new ArrayDeque();
 
             curs.moveToFirst();
             int timeCol = curs.getColumnIndex("time");
-
-            long computedTime = 0;
+            int stepTypeCol = curs.getColumnIndex("type");
+            int computedTime = 0;
 
             while (!curs.isAfterLast()) {
-                computedTime += curs.getLong(timeCol);
-                results.add(computedTime);
+                computedTime += curs.getInt(timeCol);
+                results.add(new int[]{computedTime,((int) curs.getInt(stepTypeCol))});
                 curs.moveToNext();
             }
             curs.close();
@@ -93,13 +96,14 @@ public class WorkoutDBAO implements Closeable {
         } finally {
             return results;
         }
+
     }
 
-    public ArrayList<HashMap> getSessions(long workoutId) {
+    public ArrayList<HashMap> getSessions(int workoutId) {
         initDb();
         ArrayList<HashMap> results = null;
 
-        Cursor curs = reader.rawQuery(GET_SESSIONS_FROM_WORKOUT + Long.toString(workoutId), null);
+        Cursor curs = reader.rawQuery(GET_SESSIONS_FROM_WORKOUT + Integer.toString(workoutId), null);
 
         if (curs.getCount() > 0) {
             results = new ArrayList<HashMap>();
@@ -107,11 +111,13 @@ public class WorkoutDBAO implements Closeable {
             curs.moveToFirst();
             int timeCol = curs.getColumnIndex("time");
             int rowIdCol = curs.getColumnIndex("rowid");
+            int stepTypeCol = curs.getColumnIndex("type");
 
             while (!curs.isAfterLast()) {
                 HashMap h = new HashMap();
-                h.put("time", curs.getLong(timeCol));
-                h.put("id", curs.getLong(rowIdCol));
+                h.put("time", curs.getInt(timeCol));
+                h.put("id", curs.getInt(rowIdCol));
+                h.put("type", curs.getInt(stepTypeCol));
                 results.add(h);
                 curs.moveToNext();
             }
@@ -130,15 +136,16 @@ public class WorkoutDBAO implements Closeable {
         writer = helper.getWritableDatabase();
     }
 
-    public long addSession(long workoutid, long time) {
+    public int addSession(int workoutid, int time, int type) {
         initDb();
 
         ContentValues v = new ContentValues();
         v.put("time", time);
         v.put("workoutid", workoutid);
+        v.put("type", type);
 
 
-        long sessionId = writer.insert(WorkoutDataHelper.SESSIONS_TABLE_NAME, null, v);
+        int sessionId = (int) writer.insert(WorkoutDataHelper.SESSIONS_TABLE_NAME, null, v);
 
         try {
             close();
@@ -147,16 +154,16 @@ public class WorkoutDBAO implements Closeable {
         }
     }
 
-    public long getWorkoutTotalTime(long rowid) {
+    public int getWorkoutTotalTime(int rowid) {
         initDb();
 
-        Cursor c = reader.rawQuery(GET_WORKOUT_TOTAL_TIME + Long.toString(rowid), null);
+        Cursor c = reader.rawQuery(GET_WORKOUT_TOTAL_TIME + Integer.toString(rowid), null);
 
         if (!c.moveToFirst()) {
             return 0;
         }
 
-        long totalTime = c.getLong(0);
+        int totalTime = c.getInt(0);
         try {
             close();
         } finally {
@@ -164,10 +171,11 @@ public class WorkoutDBAO implements Closeable {
         }
     }
 
-    public void removeSession(long rowId) {
+    public void removeSession(int rowId) {
         initDb();
-        Log.d("DELETE", Long.toString(rowId));
-        writer.delete(WorkoutDataHelper.SESSIONS_TABLE_NAME, "rowid = " + Long.toString(rowId), null);
+
+        Log.d("DELETE", Integer.toString(rowId));
+        writer.delete(WorkoutDataHelper.SESSIONS_TABLE_NAME, "rowid = " + Integer.toString(rowId), null);
 
         try {
             close();
@@ -176,12 +184,12 @@ public class WorkoutDBAO implements Closeable {
         }
     }
 
-    public void removeWorkout(long rowId) {
+    public void removeWorkout(int rowId) {
         initDb();
 
-        Log.d("DELETE", Long.toString(rowId));
-        writer.delete(WorkoutDataHelper.WORKOUT_TABLE_NAME, "rowid = " + Long.toString(rowId), null);
-        writer.delete(WorkoutDataHelper.SESSIONS_TABLE_NAME, "workoutid = " + Long.toString(rowId), null);
+        Log.d("DELETE", Integer.toString(rowId));
+        writer.delete(WorkoutDataHelper.WORKOUT_TABLE_NAME, "rowid = " + Integer.toString(rowId), null);
+        writer.delete(WorkoutDataHelper.SESSIONS_TABLE_NAME, "workoutid = " + Integer.toString(rowId), null);
 
         try {
             close();
@@ -190,12 +198,12 @@ public class WorkoutDBAO implements Closeable {
         }
     }
 
-    public long addWorkout(String name) {
+    public int addWorkout(String name) {
         initDb();
 
         ContentValues v = new ContentValues();
         v.put("name", name);
-        long workoutId = writer.insert(WorkoutDataHelper.WORKOUT_TABLE_NAME, null, v);
+        int workoutId = (int) writer.insert(WorkoutDataHelper.WORKOUT_TABLE_NAME, null, v);
         try {
             close();
         } finally {

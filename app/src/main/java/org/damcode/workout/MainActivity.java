@@ -2,7 +2,6 @@ package org.damcode.workout;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.IntentService;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -112,7 +111,7 @@ public class MainActivity extends Activity {
                 .setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         String name = input.getText().toString();
-                        long rowId = workoutDBAO.addWorkout(name);
+                        int rowId = workoutDBAO.addWorkout(name);
                         HashMap rowVals = new HashMap();
                         rowVals.put("name", name);
                         rowVals.put("id", rowId);
@@ -133,7 +132,7 @@ public class MainActivity extends Activity {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int i, long l) {
             Intent intent = new Intent(view.getContext(), WorkoutSessionActivity.class);
-            intent.putExtra("WORKOUT_ID", (Long) view.getTag());
+            intent.putExtra("WORKOUT_ID", (Integer) view.getTag());
 
             ((MainActivity) parent.getContext()).startActivityForResult(intent, 1);
         }
@@ -160,7 +159,7 @@ public class MainActivity extends Activity {
             TextView workoutTime = (TextView) rowView.findViewById(R.id.workout_time);
 
             tv.setText((String) rowValues.get("name"));
-            Long rowId = (Long) rowValues.get("id");
+            int rowId = (Integer) rowValues.get("id");
             rowView.setTag(rowId);
 
 

@@ -5,10 +5,10 @@ package org.damcode.workout;
  */
 public class StaticUtils {
 
-    public static String stringifyWorkoutTime(long time){
-        int hours = (int) (time / 60) / 60;
-        int mins = (int) (time / 60) % 60;
-        int secs = (int) (time % 60);
+    public static String stringifyWorkoutTime(int time){
+        int hours = (time / 60) / 60;
+        int mins =  (time / 60) % 60;
+        int secs =  (time % 60);
 
         if(hours == 0 && mins == 0 && secs == 0){
             return new String("--:--:--");

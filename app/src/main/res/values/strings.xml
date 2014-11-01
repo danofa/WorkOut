@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name">WorkOut</string>
     <string name="action_settings">Settings</string>
     <string name="action_add">Add Workout</string>
     <string name="new.workout">New Workout</string>
     <string name="title_activity_workout_item">Workout : Session</string>
-    <string name="action_add_step">Add step time (m)</string>
+    <string name="action_add_step">Add step time</string>
     <string name="session.time">Time</string>
     <string name="remove_workout">Remove Workout?</string>
     <string name="session.stopped">Stopped</string>
@@ -17,4 +16,13 @@
     <string name="dialog.ok">Ok</string>
     <string name="dialog.cancel">Cancel</string>
     <string name="workout.enternewname">Enter new name</string>
+    <string name="session.add_step_prompt">Beep type</string>
+    <string name="session.m_label">( M )</string>
+    <string name="session.s_label">( S )</string>
+    <string name="session_beep_type_1">Rest</string>
+    <string name="session_beep_type_0">Action</string>
+    <string-array name="session_beep_types">
+        <item>Action</item>
+        <item>Rest</item>
+    </string-array>
 </resources>

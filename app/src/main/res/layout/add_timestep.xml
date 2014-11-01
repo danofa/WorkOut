@@ -1,0 +1,80 @@
+<FrameLayout xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/timeStepAdd">
+
+    <TableLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="@string/session.m_label"
+                android:id="@+id/textView5"
+                android:layout_column="0" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="@string/session.s_label"
+                android:id="@+id/textView6"
+                android:layout_column="1" />
+
+            <Space
+                android:layout_width="20px"
+                android:layout_height="20px"
+                android:layout_column="2" />
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="@string/session.add_step_prompt"
+                android:id="@+id/textView7"
+                android:layout_column="3" />
+        </TableRow>
+
+
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+
+            <NumberPicker
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/numberPickerMin"
+                android:layout_column="0" />
+
+            <NumberPicker
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/numberPickerSec"
+                android:layout_column="1" />
+            <Space
+                android:layout_width="20px"
+                android:layout_height="20px"
+                android:layout_column="2" />
+
+            <Spinner
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/sessionTypeSpinner"
+                android:layout_column="3"
+                android:prompt="@string/session.add_step_prompt"
+                android:entries="@array/session_beep_types"
+                android:layout_gravity="right" />
+
+        </TableRow>
+    </TableLayout>
+</FrameLayout>

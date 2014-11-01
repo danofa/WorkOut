@@ -25,7 +25,7 @@ class ListViewItemLongClickHandler implements AdapterView.OnItemLongClickListene
                     public void onClick(DialogInterface dialog, int whichButton) {
                         ((ArrayAdapter)parent.getAdapter()).remove(parent.getAdapter().getItem(i));
 
-                        workoutDBAO.removeWorkout((Long) view.getTag());
+                        workoutDBAO.removeWorkout((Integer) view.getTag());
                     }
                 }).setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {

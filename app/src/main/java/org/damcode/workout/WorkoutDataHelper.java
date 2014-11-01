@@ -16,7 +16,7 @@ public class WorkoutDataHelper  extends SQLiteOpenHelper {
     public static final String CREATE_WORKOUT_TABLE = "CREATE TABLE " + WORKOUT_TABLE_NAME +
             " ( name TEXT )";
     public static final String CREATE_SESSIONS_TABLE = "CREATE TABLE " + SESSIONS_TABLE_NAME +
-            " ( time NUMERIC, workoutid  INTEGER)";
+            " ( time INTEGER, workoutid  INTEGER, type INTEGER)";
 
 
     public WorkoutDataHelper(Context context) {

@@ -35,12 +35,12 @@ public class WorkoutCountdownService extends Service {
 
     private List<Messenger> mClients = new ArrayList<Messenger>(); // Keeps track of all current registered clients.
     private CountDownTimer timer;
-    private long totalTime = 0, remainingTime = 0;
-    private long workoutId = -1;
-    private ArrayDeque beepQueue;
+    private int totalTime = 0, remainingTime = 0;
+    private int workoutId = -1;
+    private ArrayDeque beepQueue, origQueue;
     private boolean continuous;
     private SoundPool soundPool;
-    private int sndBeep;
+    private int sndBeep, sndPause;
 
     public boolean isRunning = false;
 
@@ -57,6 +57,7 @@ public class WorkoutCountdownService extends Service {
 
         soundPool = new SoundPool(4, AudioManager.STREAM_MUSIC, 0);
         sndBeep = soundPool.load(this, R.raw.beep, 1);
+        sndPause = soundPool.load(this, R.raw.beeppause, 1);
 
     }
 
@@ -112,7 +113,7 @@ public class WorkoutCountdownService extends Service {
 */
 
                         if (isRunning) {
-                            if (workoutId != msg.getData().getLong("workoutid")) {
+                            if (workoutId != msg.getData().getInt("workoutid")) {
                                 Log.e("Countdown handler: ", "not same workout id in register");
                                 cancelTimer();
 
@@ -123,7 +124,7 @@ public class WorkoutCountdownService extends Service {
                                 msg.replyTo.send(Message.obtain(null, MSG_TOGGLE_CONT, cont, 0));
                             }
                         }
-                        workoutId = msg.getData().getLong("workoutid");
+                        workoutId = msg.getData().getInt("workoutid");
 
                         break;
 
@@ -132,9 +133,10 @@ public class WorkoutCountdownService extends Service {
                         break;
 
                     case MSG_START_TIMER:
-                        totalTime = msg.getData().getLong("time");
+                        totalTime = msg.getData().getInt("time");
                         remainingTime = totalTime;
                         beepQueue = (ArrayDeque) msg.getData().get("beepqueue");
+                        origQueue = new ArrayDeque(beepQueue);
                         startTimer();
                         break;
 
@@ -188,10 +190,10 @@ public class WorkoutCountdownService extends Service {
         timer = new CountDownTimer((remainingTime) * 1000, 1000) {
 
             public void onTick(long millisUntilFinished) {
-                remainingTime = millisUntilFinished / 1000;
+                remainingTime = (int) (millisUntilFinished / 1000);
                 Message msg = Message.obtain(null, MSG_TIME_REMAINING);
                 Bundle b = new Bundle();
-                b.putLong("remaining", remainingTime);
+                b.putInt("remaining", (int) remainingTime);
                 msg.setData(b);
                 sendMessage(msg);
 
@@ -201,13 +203,18 @@ public class WorkoutCountdownService extends Service {
             public void onFinish() {
                 timer = null;
 
-                soundPool.play(sndBeep, 1, 1, 0, 2, 1);
+
 
                 if (continuous) {
+                    doBeep(0, totalTime);
+
                     remainingTime = totalTime;
+                    beepQueue = new ArrayDeque(origQueue);
                     startTimer();
 
                 } else {
+                    soundPool.play(sndBeep, 1, 1, 0, 2, 1);
+
                     cancelTimer();
                     sendMessage(Message.obtain(null, MSG_TIMER_FINISHED));
                 }
@@ -216,12 +223,21 @@ public class WorkoutCountdownService extends Service {
 
     }
 
-    private void doBeep(long remainingTime, long totalTime) {
+    private void doBeep(int remainingTime, int totalTime) {
 
-        long elapsedTime = totalTime - remainingTime;
+        int elapsedTime = totalTime - remainingTime;
 
-        if ((Long) beepQueue.peek() == elapsedTime) {
-            soundPool.play(sndBeep, 1, 1, 0, 1, 1);
+
+        if (((int[]) beepQueue.peek())[0] == elapsedTime) {
+            int beepType = ((int[]) beepQueue.peek())[1];
+
+            if(beepType == WorkoutSessionActivity.BEEP_TYPE_ACTION){
+                soundPool.play(sndBeep, 1, 1, 0, 1, 1);
+
+            } else if(beepType == WorkoutSessionActivity.BEEP_TYPE_REST){
+                soundPool.play(sndPause, 1, 1, 0, 1, 2);
+            }
+
             beepQueue.poll();
         }
 

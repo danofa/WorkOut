@@ -24,6 +24,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.NumberPicker;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
@@ -35,8 +36,11 @@ import java.util.Map;
 
 public class WorkoutSessionActivity extends Activity {
 
-    long workoutId;
-    long totalTime;
+    public static final int BEEP_TYPE_REST = 1;
+    public static final int BEEP_TYPE_ACTION = 0;
+
+    int workoutId;
+    int totalTime;
     boolean isStarted = false;
 
     ToggleButton startStopToggle, continuousRunToggle;
@@ -101,7 +105,7 @@ public class WorkoutSessionActivity extends Activity {
 
         sessionAdapter = new SessionItemAdapter(this, sessionListValues);
 
-        workoutId = getIntent().getLongExtra("WORKOUT_ID", -1);
+        workoutId = getIntent().getIntExtra("WORKOUT_ID", -1);
         workoutDBAO = new WorkoutDBAO(this);
         timeleftView = (TextView) findViewById(R.id.timeLeft);
 
@@ -124,7 +128,7 @@ public class WorkoutSessionActivity extends Activity {
     private void setTotalTime() {
         totalTime = 0;
         for (Map h : sessionAdapter.values) {
-            totalTime += (Long) h.get("time");
+            totalTime += (Integer) h.get("time");
         }
         isStarted = false;
         timeleftView.setText(StaticUtils.stringifyWorkoutTime(totalTime));
@@ -140,6 +144,10 @@ public class WorkoutSessionActivity extends Activity {
 
         Log.d("TOGGLE CHANGE", String.valueOf(on) + " isStarted: " + String.valueOf(isStarted));
 
+        if(totalTime == 0){
+            return;
+        }
+
         if (on) {
             Message msg;
             if (isStarted) {
@@ -149,10 +157,9 @@ public class WorkoutSessionActivity extends Activity {
                 isStarted = true;
             }
 
-            ArrayDeque beepQueue = workoutDBAO.getBeepQueue(workoutId);
             Bundle b = new Bundle();
-            b.putLong("time", totalTime);
-            b.putSerializable("beepqueue", beepQueue);
+            b.putInt("time", totalTime);
+            b.putSerializable("beepqueue", new ArrayDeque(workoutDBAO.getBeepQueue(workoutId)));
             msg.setData(b);
             msg.replyTo = messenger;
             try {
@@ -160,6 +167,7 @@ public class WorkoutSessionActivity extends Activity {
             } catch (RemoteException e) {
                 // failed to send message
             }
+
         } else {
             Message msg = Message.obtain(null, WorkoutCountdownService.MSG_PAUSE_TIMER);
             msg.replyTo = messenger;
@@ -191,28 +199,38 @@ public class WorkoutSessionActivity extends Activity {
 
     public void addTimeStep(View view) {
 
-        final NumberPicker np = new NumberPicker(view.getContext());
-        np.setMaxValue(60);
-        np.setMinValue(1);
-/*
-        String displayValues[] = {"5", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55", "60"};
-        np.setDisplayedValues(displayValues);
-*/
+        View test = findViewById(R.id.timeStepAdd);
+        LayoutInflater mInflater = LayoutInflater.from(this);
+        View newStepView = mInflater.inflate(R.layout.add_timestep, null);
+        final NumberPicker npm = (NumberPicker) newStepView.findViewById(R.id.numberPickerMin);
+        final NumberPicker nps = (NumberPicker) newStepView.findViewById(R.id.numberPickerSec);
+        npm.setMinValue(0);
+        nps.setMinValue(0);
+        npm.setMaxValue(60);
+        nps.setMaxValue(59);
+        final Spinner sp = (Spinner) newStepView.findViewById(R.id.sessionTypeSpinner);
 
-        new AlertDialog.Builder(view.getContext())
+        new AlertDialog.Builder(this)
                 .setTitle(R.string.action_add_step)
-                .setView(np)
+                .setView(newStepView)
                 .setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        long time = np.getValue() * 60;//((np.getValue() + 1) * 5) * 60;
-                        long id = workoutDBAO.addSession(workoutId, time);
-                        Log.d("row id from session", Long.toString(id));
+                        int time = (npm.getValue() * 60) + nps.getValue();
+                        int beepType = sp.getSelectedItemPosition();
+                        Log.d("WorkoutSession","Add session step: " + time +", "+beepType);
+
+                        int id = workoutDBAO.addSession(workoutId, time, beepType);
+                        Log.d("row id from session", Integer.toString(id));
                         Map newRow = new HashMap();
                         newRow.put("time", time);
                         newRow.put("id", id);
+                        newRow.put("type", beepType);
                         sessionAdapter.add(newRow);
 
                         setTotalTime();
+
+
+
                     }
                 })
                 .setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
@@ -249,11 +267,13 @@ public class WorkoutSessionActivity extends Activity {
             View rowView = inflater.inflate(R.layout.session_list_layout_row, parent, false);
 
             TextView tv = (TextView) rowView.findViewById(R.id.stepTime);
-            String time = Long.toString((Long) values.get(position).get("time") / 60);
-            final long rowId = (Long) values.get(position).get("id");
+            String time = StaticUtils.stringifyWorkoutTime((Integer) values.get(position).get("time"));
+            final int rowId = (Integer) values.get(position).get("id");
+            int beepStringId = getResources().getIdentifier("session_beep_type_" + values.get(position).get("type"),"string",getPackageName());
 
             rowView.setTag(rowId);
-            tv.setText(time);
+
+            tv.setText(time + " - " + getResources().getString(beepStringId));
 
             ImageButton delSession = (ImageButton) rowView.findViewById(R.id.session_item_del);
             delSession.setOnClickListener(new View.OnClickListener() {
@@ -288,7 +308,7 @@ public class WorkoutSessionActivity extends Activity {
                         break;
 
                     case WorkoutCountdownService.MSG_TIME_REMAINING:
-                        timeleftView.setText(StaticUtils.stringifyWorkoutTime(msg.getData().getLong("remaining")));
+                        timeleftView.setText(StaticUtils.stringifyWorkoutTime(msg.getData().getInt("remaining")));
                         break;
 
                     case WorkoutCountdownService.MSG_TIMER_FINISHED:
@@ -328,7 +348,7 @@ public class WorkoutSessionActivity extends Activity {
             try {
                 Message msg = Message.obtain(null, WorkoutCountdownService.MSG_REGISTER_CLIENT);
                 Bundle b = new Bundle();
-                b.putLong("workoutid", workoutId);
+                b.putInt("workoutid", workoutId);
                 msg.setData(b);
                 msg.replyTo = messenger;
                 serviceMessenger.send(msg);
