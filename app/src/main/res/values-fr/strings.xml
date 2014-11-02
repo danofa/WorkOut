@@ -18,6 +18,8 @@
     <string name="dialog.ok">Ok</string>
     <string name="dialog.cancel">Annuler</string>
     <string name="workout.enternewname">Entrer un nouveau nom</string>
+    <string name="session.m_label">( M )</string>
+    <string name="session.s_label">( S )</string>
     <string name="session_beep_type_1">Pause</string>
     <string name="session_beep_type_0">Activité</string>
     <string-array name="session_beep_types">
